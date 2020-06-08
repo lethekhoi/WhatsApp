@@ -41,7 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         init();
 
-//
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
         txthaveanaccount.setOnClickListener(new View.OnClickListener() {
@@ -124,8 +124,8 @@ public class RegisterActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
 
-
-
+                                        String currentUserID = mAuth.getCurrentUser().getUid();
+                                        mDatabase.child("users").child(currentUserID).setValue("");
                                         SendUsertoMainActivity();
                                         Toast.makeText(RegisterActivity.this, "Đăng kí thành công", Toast.LENGTH_SHORT).show();
                                         progressDialog.dismiss();

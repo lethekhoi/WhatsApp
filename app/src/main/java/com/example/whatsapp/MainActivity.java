@@ -49,13 +49,15 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.logout:
-                Toast.makeText(this, "Log out", Toast.LENGTH_SHORT).show();
+
                 mAuth.signOut();
                 SendUserToLoginActivity();
 
                 break;
+            case R.id.settings:
+
+                break;
             case R.id.main_find_friend_option:
-                Toast.makeText(this, "find friend", Toast.LENGTH_SHORT).show();
 
                 break;
         }
