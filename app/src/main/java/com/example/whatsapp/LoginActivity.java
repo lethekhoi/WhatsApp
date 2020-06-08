@@ -1,21 +1,27 @@
 package com.example.whatsapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
-    FirebaseUser currentUser;
+
     Button btnLogin, btnPhoneLogin;
     EditText userEmail, userPassword;
     TextView txtNeesNewAccount, txtForgetPassword;
@@ -29,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         init();
+        mAuth = FirebaseAuth.getInstance();
 
         txtNeesNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,20 +44,97 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(iRegister);
             }
         });
+        userEmail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+                if (!b) {
+
+                    String chuoi = userEmail.getText().toString();
+
+                    if (chuoi.trim().equals("") || chuoi.equals(null)) {
+                        textInputLayoutEmail.setError("Bạn chưa nhập địa chỉ Email");
+                        textInputLayoutEmail.setEnabled(true);
+                        kiemtrathongtin = false;
+
+                    } else {
+
+                        Boolean kiemtraemail = Patterns.EMAIL_ADDRESS.matcher(chuoi).matches();
+                        if (!kiemtraemail) {
+                            textInputLayoutEmail.setError("Đây không phải địa chỉ Email");
+                            textInputLayoutEmail.setErrorEnabled(true);
+                            kiemtrathongtin = false;
+
+
+                        } else {
+                            textInputLayoutEmail.setError("");
+                            textInputLayoutEmail.setErrorEnabled(false);
+                            kiemtrathongtin = true;
+
+                        }
+                    }
+                }
+            }
+        });
+        userPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    String chuoi = userPassword.getText().toString();
+                    if (chuoi.trim().equals("") || chuoi.equals(null)) {
+                        textInputLayoutPassword.setError("Bạn chưa nhập mật khẩu");
+                        textInputLayoutPassword.setErrorEnabled(true);
+                        kiemtrathongtin = false;
+                    } else {
+                        textInputLayoutPassword.setError("");
+                        textInputLayoutPassword.setErrorEnabled(false);
+                        kiemtrathongtin = true;
+                    }
+                }
+            }
+        });
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = userEmail.getText().toString().trim();
+                String password = userPassword.getText().toString().trim();
+                if (kiemtrathongtin) {
+                    progressDialog.setTitle("Đang đăng nhập");
+                    progressDialog.setMessage("Vui lòng chờ trong giây lát");
+                    progressDialog.setCanceledOnTouchOutside(true);
+                    progressDialog.show();
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        SendUsertoMainActivity();
+                                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                                        progressDialog.dismiss();
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                                        progressDialog.dismiss();
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (currentUser!=null){
-            SendUserToMainActivity();
-        }
-    }
 
-    private void SendUserToMainActivity() {
-        Intent iMain= new Intent(LoginActivity.this, MainActivity.class);
+
+
+
+
+    private void SendUsertoMainActivity() {
+        Intent iMain = new Intent(LoginActivity.this, MainActivity.class);
+        iMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(iMain);
+        finish();
     }
+
     private void init() {
         btnLogin = findViewById(R.id.cirLoginButton);
         btnPhoneLogin = findViewById(R.id.LoginPhone);

@@ -126,7 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-                                        SendUsertoLoginActivity();
+                                        SendUsertoMainActivity();
                                         Toast.makeText(RegisterActivity.this, "Đăng kí thành công", Toast.LENGTH_SHORT).show();
                                         progressDialog.dismiss();
 
@@ -153,8 +153,10 @@ public class RegisterActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
     }
 
-    private void SendUsertoLoginActivity() {
-        Intent iLogin = new Intent(RegisterActivity.this, LoginActivity.class);
-        startActivity(iLogin);
+    private void SendUsertoMainActivity() {
+        Intent iMain = new Intent(RegisterActivity.this, MainActivity.class);
+        iMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(iMain);
+        finish();
     }
 }
