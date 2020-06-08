@@ -4,16 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.whatsapp.Adapter.TabsAccessorAdapter;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     TabLayout tabLayout;
     ViewPager viewPager;
     TabsAccessorAdapter tabsAccessorAdapter;
+    FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,21 @@ public class MainActivity extends AppCompatActivity {
         tabsAccessorAdapter = new TabsAccessorAdapter(getSupportFragmentManager());
         viewPager.setAdapter(tabsAccessorAdapter);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+         if (currentUser==null){
+             SendUserToLoginActivity();
+         }
+    }
+
+    private void SendUserToLoginActivity() {
+        Intent iLogin= new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(iLogin);
+
     }
 
     private void init() {
