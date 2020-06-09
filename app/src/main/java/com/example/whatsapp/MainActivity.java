@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
             case R.id.settings:
-
+                SendUserToSettingActivity();
                 break;
             case R.id.main_find_friend_option:
 
@@ -66,17 +66,30 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private void SendUserToSettingActivity() {
+        Intent iSetting= new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(iSetting);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
          if (currentUser==null){
              SendUserToLoginActivity();
+         }else{
+             VerifyUserExistance();
          }
+    }
+
+    private void VerifyUserExistance() {
+
     }
 
     private void SendUserToLoginActivity() {
         Intent iLogin= new Intent(MainActivity.this, LoginActivity.class);
+        iLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(iLogin);
+        finish();
 
     }
 
