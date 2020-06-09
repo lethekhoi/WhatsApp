@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
          if (currentUser==null){
              SendUserToLoginActivity();
          }else{
-        //     VerifyUserExistance();
+           VerifyUserExistance();
          }
     }
 
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     if (dataSnapshot.child("name").exists()){
                         Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
                     }else{
-                      SendUserToSettingActivity();
+                          SendUserToSettingActivity();
                     }
                 }
 
@@ -113,9 +113,8 @@ public class MainActivity extends AppCompatActivity {
     }
     private void SendUserToSettingActivity() {
         Intent iSetting= new Intent(MainActivity.this, SettingsActivity.class);
-        iSetting.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(iSetting);
-        finish();
+
 
     }
 
