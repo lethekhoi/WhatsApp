@@ -1,17 +1,22 @@
 package com.example.whatsapp;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.whatsapp.Adapter.TabsAccessorAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,6 +26,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     DatabaseReference mDatabase;
@@ -29,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     TabsAccessorAdapter tabsAccessorAdapter;
     FirebaseUser currentUser;
     FirebaseAuth mAuth;
+    String currentUserID;
+    Date currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+
+        currentUserID = currentUser == null ? "" : mAuth.getCurrentUser().getUid();
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("WhatsApp");
 
@@ -45,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(tabsAccessorAdapter);
         tabLayout.setupWithViewPager(viewPager);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
@@ -54,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             case R.id.logout:
 
                 mAuth.signOut();
@@ -67,52 +81,102 @@ public class MainActivity extends AppCompatActivity {
             case R.id.main_find_friend_option:
 
                 break;
+            case R.id.creatGroup:
+                RequestNewGroup();
+                break;
         }
 
 
         return true;
     }
 
+    private void RequestNewGroup() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
+        builder.setTitle("Nhập tên nhóm");
+        final EditText groupNameField = new EditText(MainActivity.this);
+        groupNameField.setHint("e.g Coding Cafe");
+        builder.setView(groupNameField);
+        builder.setPositiveButton("Tạo", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String groupName = groupNameField.getText().toString().trim();
+                if (groupName.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Vui lòng nhập tên nhóm", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    CreatNewGroup(groupName);
+                }
+
+            }
+        });
+        builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void CreatNewGroup(final String groupName) {
+        currentTime = Calendar.getInstance().getTime();
+        HashMap<String, String> profileMap = new HashMap<>();
+        profileMap.put("name", groupName);
+        profileMap.put("userID", currentUserID);
+        profileMap.put("time", currentTime.toString());
+        mDatabase.child("Group").child(groupName).setValue(profileMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MainActivity.this, groupName + " được tạo thành công", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, " Tạo thất bại", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-         if (currentUser==null){
-             SendUserToLoginActivity();
-         }else{
-           VerifyUserExistance();
-         }
+        if (currentUser == null) {
+            SendUserToLoginActivity();
+        } else {
+            VerifyUserExistance();
+        }
     }
 
     private void VerifyUserExistance() {
-            String currentUserID= mAuth.getCurrentUser().getUid();
-            mDatabase.child("users").child(currentUserID).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child("name").exists()){
-                        Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
-                    }else{
-                          SendUserToSettingActivity();
-                    }
+        String currentUserID = mAuth.getCurrentUser().getUid();
+        mDatabase.child("users").child(currentUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child("name").exists()) {
+                    Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
+                } else {
+                    SendUserToSettingActivity();
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
     }
 
     private void SendUserToLoginActivity() {
-        Intent iLogin= new Intent(MainActivity.this, LoginActivity.class);
+        Intent iLogin = new Intent(MainActivity.this, LoginActivity.class);
         iLogin.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(iLogin);
         finish();
 
     }
+
     private void SendUserToSettingActivity() {
-        Intent iSetting= new Intent(MainActivity.this, SettingsActivity.class);
+        Intent iSetting = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(iSetting);
 
 
