@@ -53,6 +53,8 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 SendMessageInfotoDatabase();
                 edtmessage.setText("");
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+
             }
         });
 
@@ -101,8 +103,8 @@ public class GroupChatActivity extends AppCompatActivity {
             String chatMessage = (String) ((DataSnapshot) iterator.next()).getValue();
             String chatName = (String) ((DataSnapshot) iterator.next()).getValue();
             String chatTime = (String) ((DataSnapshot) iterator.next()).getValue();
-            displayTextMessage.append(chatName + ":\n" + chatMessage + ":\n" + chatDate + ":\n" + chatTime + "\n\n");
-
+            displayTextMessage.append(chatName + ":\n" + chatMessage + ":\n" + chatDate + ":" + chatTime + "\n\n");
+            scrollView.fullScroll(ScrollView.FOCUS_DOWN);
         }
     }
 
