@@ -54,6 +54,7 @@ public class GroupsFragment extends Fragment {
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                groupDetailList.clear();
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     GroupDetail groupDetail = dataSnapshot1.getValue(GroupDetail.class);
                     groupDetailList.add(groupDetail);
