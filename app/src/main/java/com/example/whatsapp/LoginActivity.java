@@ -38,16 +38,13 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
 
-
-
-
-
-
-
-
-
-
-
+        btnPhoneLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent iPhoneLogin = new Intent(LoginActivity.this, PhoneLoginActivity.class);
+                startActivity(iPhoneLogin);
+            }
+        });
 
 
         txtNeesNewAccount.setOnClickListener(new View.OnClickListener() {
