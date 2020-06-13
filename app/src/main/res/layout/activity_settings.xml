@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
             <RelativeLayout
                 android:id="@+id/rellay1"
                 android:layout_width="match_parent"
@@ -26,8 +26,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/circle_border">
+                    android:layout_marginTop="20dp">
 
                     <ImageView
                         android:id="@+id/imgProfile"
@@ -35,10 +34,9 @@
                         android:layout_height="120dp"
                         android:layout_margin="9dp"
                         android:adjustViewBounds="true"
-                        android:background="@drawable/circle"
                         android:padding="3dp"
                         android:scaleType="centerInside"
-                       />
+                        android:src="@drawable/khoi" />
 
                 </RelativeLayout>
 
@@ -47,19 +45,19 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="15dp"
                     android:layout_marginTop="15dp"
+                    android:layout_marginRight="15dp"
                     android:adjustViewBounds="true"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_settings" />
 
             </RelativeLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/rellay1"
-                android:layout_marginTop="100dp"
-                >
+                android:layout_marginTop="100dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -152,11 +150,6 @@
         </LinearLayout>
 
     </ScrollView>
-
-
-
-
-
 
 
 </RelativeLayout>
