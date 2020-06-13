@@ -1,5 +1,6 @@
 package com.example.whatsapp;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.whatsapp.Adapter.AdapterGroup;
 import com.example.whatsapp.Model.GroupDetail;
+import com.example.whatsapp.Model.UserProfile;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
