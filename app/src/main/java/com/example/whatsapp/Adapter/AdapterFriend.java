@@ -1,16 +1,20 @@
 package com.example.whatsapp.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.whatsapp.GroupChatActivity;
 import com.example.whatsapp.Model.UserProfile;
+import com.example.whatsapp.ProfileActivity;
 import com.example.whatsapp.R;
 import com.squareup.picasso.Picasso;
 
@@ -34,6 +38,8 @@ public class AdapterFriend extends RecyclerView.Adapter<AdapterFriend.ViewHolder
             txtName = itemView.findViewById(R.id.txtUserName);
             txtStatus = itemView.findViewById(R.id.txtUserStatus);
             imgUserProfil = itemView.findViewById(R.id.user_profile_image);
+
+
         }
     }
 
@@ -48,7 +54,7 @@ public class AdapterFriend extends RecyclerView.Adapter<AdapterFriend.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        UserProfile userProfile = userProfileList.get(position);
+        final UserProfile userProfile = userProfileList.get(position);
         holder.txtName.setText(userProfile.getName());
         holder.txtStatus.setText(userProfile.getStatus());
         if (userProfile.getImage() == null) {
@@ -56,6 +62,15 @@ public class AdapterFriend extends RecyclerView.Adapter<AdapterFriend.ViewHolder
         } else {
             Picasso.get().load(userProfile.getImage()).into(holder.imgUserProfil);
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String visit_user_id = userProfile.getUid();
+                Intent iProfile = new Intent(context, ProfileActivity.class);
+                iProfile.putExtra("userprofile", userProfile);
+                context.startActivity(iProfile);
+            }
+        });
 
     }
 
