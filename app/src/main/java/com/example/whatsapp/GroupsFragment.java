@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.whatsapp.Adapter.AdapterGroup;
 import com.example.whatsapp.Model.GroupDetail;
 import com.example.whatsapp.Model.UserProfile;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,6 +52,7 @@ public class GroupsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_groups, container, false);
         groupDetailList = new ArrayList<>();
 
+
         recyclerViewGroup = view.findViewById(R.id.recyclerGroup);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Group");
         mDatabase.addValueEventListener(new ValueEventListener() {
@@ -78,6 +80,12 @@ public class GroupsFragment extends Fragment {
 
         return view;
 
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
     }
 }

@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.example.whatsapp.ChatFragment;
 import com.example.whatsapp.ContactsFragment;
 import com.example.whatsapp.GroupsFragment;
+import com.example.whatsapp.RequestFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,11 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter {
         listFragment.add(new ChatFragment());
         listFragment.add(new ContactsFragment());
         listFragment.add(new GroupsFragment());
-
+        listFragment.add(new RequestFragment());
         titleFragment.add("Chat");
         titleFragment.add("Contacts");
         titleFragment.add("Groups");
+        titleFragment.add("Request");
     }
 
     @NonNull

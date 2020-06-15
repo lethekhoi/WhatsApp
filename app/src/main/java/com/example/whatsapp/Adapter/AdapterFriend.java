@@ -57,7 +57,7 @@ public class AdapterFriend extends RecyclerView.Adapter<AdapterFriend.ViewHolder
         final UserProfile userProfile = userProfileList.get(position);
         holder.txtName.setText(userProfile.getName());
         holder.txtStatus.setText(userProfile.getStatus());
-        if (userProfile.getImage() == null) {
+        if (userProfile.getImage() == null | userProfile.getImage() == "") {
             holder.imgUserProfil.setImageResource(R.drawable.default_user);
         } else {
             Picasso.get().load(userProfile.getImage()).into(holder.imgUserProfil);

@@ -52,6 +52,7 @@ public class FindFriendActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 userProfileList.clear();
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+
                     UserProfile userProfile = dataSnapshot1.getValue(UserProfile.class);
                     userProfileList.add(userProfile);
                 }
