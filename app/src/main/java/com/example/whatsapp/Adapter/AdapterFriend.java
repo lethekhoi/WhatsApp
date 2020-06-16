@@ -7,12 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.whatsapp.GroupChatActivity;
 import com.example.whatsapp.Model.UserProfile;
 import com.example.whatsapp.ProfileActivity;
 import com.example.whatsapp.R;

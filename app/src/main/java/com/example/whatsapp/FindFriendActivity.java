@@ -8,13 +8,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.whatsapp.Adapter.AdapterFriend;
-import com.example.whatsapp.Model.GroupDetail;
 import com.example.whatsapp.Model.UserProfile;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
