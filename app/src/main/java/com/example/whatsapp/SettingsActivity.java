@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,6 +24,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,6 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
         currentUserID = mAuth.getCurrentUser().getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         UserProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
+
 
         RetrieveUserInfo();
 
@@ -119,12 +123,12 @@ public class SettingsActivity extends AppCompatActivity {
                 String status = edtUserStatus.getText().toString().trim();
 
                 if (kiemtrathongtin) {
-                    HashMap<String, String> profileMap = new HashMap<>();
+                    HashMap<String, Object> profileMap = new HashMap<>();
                     profileMap.put("uid", currentUserID);
                     profileMap.put("name", username);
                     profileMap.put("status", status);
 
-                    mDatabase.child("users").child(currentUserID).setValue(profileMap)
+                    mDatabase.child("users").child(currentUserID).updateChildren(profileMap)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -141,9 +145,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
 
         if (requestCode == GalleryPick && resultCode == RESULT_OK && data != null) {
             Uri imageUri = data.getData();
@@ -211,17 +217,24 @@ public class SettingsActivity extends AppCompatActivity {
         mDatabase.child("users").child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child("name").exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("status") && dataSnapshot.hasChild("image")) {
+                if (!dataSnapshot.child("image").exists()) {
+                    SetDefaultUserImage();
+                    finish();
+                } else if (dataSnapshot.child("name").exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("status") && dataSnapshot.hasChild("image")) {
                     String image = dataSnapshot.child("image").getValue().toString();
                     edtUserName.setText(dataSnapshot.child("name").getValue().toString());
                     edtUserStatus.setText(dataSnapshot.child("status").getValue().toString());
                     Picasso.get().load(image).into(imgProfile);
                 } else if (dataSnapshot.child("name").exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("status")) {
+                    String image = dataSnapshot.child("image").getValue().toString();
+                    Picasso.get().load(image).into(imgProfile);
                     edtUserName.setText(dataSnapshot.child("name").getValue().toString());
                     edtUserStatus.setText(dataSnapshot.child("status").getValue().toString());
                 } else {
+                    String image = dataSnapshot.child("image").getValue().toString();
+                    Picasso.get().load(image).into(imgProfile);
                     edtUserName.setVisibility(View.VISIBLE);
-                    Toast.makeText(SettingsActivity.this, "Please Update your profile name  ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SettingsActivity.this, "Please Update your profile name", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -242,4 +255,54 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
+    private void SetDefaultUserImage() {
+
+
+        Uri defaultImageUri = Uri.parse("android.resource://" + R.class.getPackage().getName() + "/" + R.drawable.default_user);
+        final StorageReference filePath = UserProfileImageRef.child(currentUserID + ".jpg");
+        UploadTask uploadTask = filePath.putFile(defaultImageUri);
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                // Continue with the task to get the download URL
+                return filePath.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    Toast.makeText(SettingsActivity.this, "Successfully uploaded", Toast.LENGTH_SHORT).show();
+
+                    if (downloadUri != null) {
+
+
+                        String downloadUrl = downloadUri.toString(); //YOU WILL GET THE DOWNLOAD URL HERE !!!!
+                        mDatabase.child("users").child(currentUserID).child("image").setValue(downloadUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                                if (!task.isSuccessful()) {
+                                    String error = task.getException().toString();
+                                    Toast.makeText(SettingsActivity.this, "Error : " + error, Toast.LENGTH_LONG).show();
+                                } else {
+
+                                }
+                            }
+                        });
+                    }
+
+                } else {
+                    // Handle failures
+                    // ...
+                    Toast.makeText(SettingsActivity.this, "Error", Toast.LENGTH_LONG).show();
+
+                }
+            }
+        });
+    }
 }

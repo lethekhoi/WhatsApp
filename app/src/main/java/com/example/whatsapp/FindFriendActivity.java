@@ -74,6 +74,7 @@ public class FindFriendActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Find Friend");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         progressDialog = new ProgressDialog(this);
     }
 
