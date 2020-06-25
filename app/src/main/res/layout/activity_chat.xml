@@ -11,12 +11,12 @@
         layout="@layout/app_bar_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMessageList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/myLinearLayout"
         android:layout_below="@id/chat_tool_bar"
         android:layout_marginLeft="5dp"
-        android:layout_marginTop="10dp"
         android:layout_marginRight="5dp" />
 
     <LinearLayout

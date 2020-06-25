@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="2dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/imgcardview"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignBottom="@id/receive_message_text"
+        app:cardCornerRadius="15dp">
+
+        <ImageView
+            android:id="@+id/message_profile_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+
+            android:src="@drawable/default_user" />
+    </androidx.cardview.widget.CardView>
+
+
+    <TextView
+        android:id="@+id/receive_message_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="45dp"
+        android:layout_toEndOf="@id/imgcardview"
+        android:background="@drawable/receive_message_layout"
+        android:padding="7dp"
+        android:text="tin nhan nhận được"
+        android:textColor="@color/colorBlack"
+        android:textSize="15sp" />
+
+
+    <TextView
+        android:id="@+id/send_message_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="@+id/receive_message_text"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginRight="2dp"
+        android:background="@drawable/send_message_layout"
+        android:padding="7dp"
+        android:text="tin nhan gửi đi "
+        android:textColor="@color/white"
+        android:textSize="15sp" />
+</RelativeLayout>

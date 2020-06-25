@@ -55,7 +55,7 @@ public class AdapterChatList extends RecyclerView.Adapter<AdapterChatList.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final UserProfile userProfile = userProfileList.get(position);
         holder.txtName.setText(userProfile.getName());
-        holder.txtStatus.setText("Last seen: " );
+        holder.txtStatus.setText("Last seen: ");
         if (userProfile.getImage() == null | userProfile.getImage() == "") {
             holder.imgUserProfil.setImageResource(R.drawable.default_user);
         } else {

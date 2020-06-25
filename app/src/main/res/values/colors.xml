@@ -15,7 +15,8 @@
     <!--colros for card-->
     <color name="whiteCardColor">#fff</color>
     <color name="address">#2F7092</color>
-
+    <color name="receive_mess">#CFCFCF</color>
+    <color name="send_mess">#174FDC</color>
     <color name="followers">#0D5D98</color>
 
     <color name="headings">#3797CF</color>
