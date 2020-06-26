@@ -22,6 +22,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -128,8 +129,14 @@ public class RegisterActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
 
+                                        String deviceToken = FirebaseInstanceId.getInstance().getToken();
+
                                         String currentUserID = mAuth.getCurrentUser().getUid();
                                         mDatabase.child("users").child(currentUserID).setValue("");
+
+                                        mDatabase.child("users").child(currentUserID).child("device_token")
+                                                .setValue(deviceToken);
+
                                         SendUsertoMainActivity();
                                         Toast.makeText(RegisterActivity.this, "Đăng kí thành công", Toast.LENGTH_SHORT).show();
                                         progressDialog.dismiss();

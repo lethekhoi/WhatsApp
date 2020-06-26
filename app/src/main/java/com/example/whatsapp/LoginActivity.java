@@ -19,6 +19,9 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -29,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     boolean kiemtrathongtin = false;
     FirebaseAuth mAuth;
     ProgressDialog progressDialog;
+    DatabaseReference mDatabaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         init();
         mAuth = FirebaseAuth.getInstance();
+        mDatabaseUser = FirebaseDatabase.getInstance().getReference().child("users");
 
 
         btnPhoneLogin.setOnClickListener(new View.OnClickListener() {
@@ -118,8 +123,19 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        SendUsertoMainActivity();
-                                        progressDialog.dismiss();
+                                        String currentUserID = mAuth.getCurrentUser().getUid();
+                                        String deviceToken = FirebaseInstanceId.getInstance().getToken();
+                                        mDatabaseUser.child(currentUserID).child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    SendUsertoMainActivity();
+                                                    progressDialog.dismiss();
+                                                }
+                                            }
+                                        });
+
+
                                     } else {
                                         Toast.makeText(LoginActivity.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
                                         progressDialog.dismiss();
