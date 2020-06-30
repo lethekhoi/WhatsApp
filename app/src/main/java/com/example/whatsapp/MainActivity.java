@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -150,7 +151,26 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser == null) {
             SendUserToLoginActivity();
         } else {
+            updateUserState("online");
+
             VerifyUserExistance();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (currentUser != null) {
+            updateUserState("offline");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (currentUser != null) {
+            updateUserState("offline");
         }
     }
 
@@ -160,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child("name").exists()) {
-                 
+
                 } else {
                     SendUserToSettingActivity();
                 }
@@ -192,5 +212,22 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.main_app_bar);
         tabLayout = findViewById(R.id.tablayout);
         viewPager = findViewById(R.id.viewPager);
+    }
+
+    private void updateUserState(String state) {
+        String saveCurrentTime, saveCurrentDay;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat currentDay = new SimpleDateFormat("MM dd, yyyy");
+        saveCurrentDay = currentDay.format(calendar.getTime());
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+        onlineStateMap.put("time", saveCurrentTime);
+        onlineStateMap.put("day", saveCurrentDay);
+        onlineStateMap.put("state", state);
+        mDatabase.child("users").child(currentUserID).child("userState")
+                .updateChildren(onlineStateMap);
+
     }
 }

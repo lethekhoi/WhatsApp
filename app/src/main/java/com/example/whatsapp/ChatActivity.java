@@ -175,13 +175,38 @@ public class ChatActivity extends AppCompatActivity {
         userImage = findViewById(R.id.custom_profile_image);
         visit_user_name = findViewById(R.id.custom_profile_name);
         visit_user_last_seen = findViewById(R.id.custom_user_last_seen);
-
+        DisplayLastSeen();
         adapterMessage = new AdapterMessage(messageList, ChatActivity.this);
         recyclerViewChatList = findViewById(R.id.recyclerMessageList);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ChatActivity.this);
         recyclerViewChatList.setLayoutManager(layoutManager);
         recyclerViewChatList.setAdapter(adapterMessage);
 
+    }
+
+    private void DisplayLastSeen() {
+        mDatabase.child("users").child(receiveUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child("userState").hasChild("state")) {
+                    String date = dataSnapshot.child("userState").child("day").getValue().toString();
+                    String time = dataSnapshot.child("userState").child("time").getValue().toString();
+                    String state = dataSnapshot.child("userState").child("state").getValue().toString();
+                    if (state.equals("online")) {
+                        visit_user_last_seen.setText("online");
+                    } else if (state.equals("offline")) {
+                        visit_user_last_seen.setText("Last seen :" + date + " " + time);
+                    }
+                } else {
+                    visit_user_last_seen.setText("offline");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void DataIntent() {

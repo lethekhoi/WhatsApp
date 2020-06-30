@@ -5,12 +5,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.whatsapp.Adapter.AdapterChatList;
 import com.example.whatsapp.Adapter.AdapterFriend;
 import com.example.whatsapp.Adapter.AdapterRequest;
 import com.example.whatsapp.Model.UserProfile;
@@ -32,7 +34,7 @@ import java.util.List;
  */
 public class RequestFragment extends Fragment {
     View view;
-    List<UserProfile> userProfileList;
+    List<String> userIDList;
     RecyclerView recyclerViewRequest;
     private FirebaseAuth mAuth;
     private String currentUserID;
@@ -48,7 +50,7 @@ public class RequestFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        userProfileList = new ArrayList<>();
+        userIDList = new ArrayList<>();
         view = inflater.inflate(R.layout.fragment_request, container, false);
         recyclerViewRequest = view.findViewById(R.id.recyclerRequest);
         mAuth = FirebaseAuth.getInstance();
@@ -62,30 +64,17 @@ public class RequestFragment extends Fragment {
             mRequestDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    userProfileList.clear();
+                    userIDList.clear();
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                        Log.d("ppp", dataSnapshot1.getKey().toString());
-                        if (dataSnapshot1.child("request_type").getValue().toString().equals("received")) {
-                            mUserDatabase.child(dataSnapshot1.getKey())
-                                    .addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
-                                            userProfileList.add(userProfile);
-                                            AdapterRequest adapterRequest = new AdapterRequest(getContext(), userProfileList, currentUserID);
-                                            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-                                            recyclerViewRequest.setLayoutManager(layoutManager);
-                                            recyclerViewRequest.setAdapter(adapterRequest);
-                                            adapterRequest.notifyDataSetChanged();
-                                        }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-                        }
+                        userIDList.add(dataSnapshot1.getKey().toString());
                     }
+                    AdapterRequest adapterRequest = new AdapterRequest(getContext(), userIDList, currentUserID);
+                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+                    recyclerViewRequest.setLayoutManager(layoutManager);
+                    recyclerViewRequest.setAdapter(adapterRequest);
+                    adapterRequest.notifyDataSetChanged();
+
                 }
 
                 @Override

@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.whatsapp.Adapter.AdapterChatList;
+import com.example.whatsapp.Adapter.AdapterContact;
 import com.example.whatsapp.Adapter.AdapterFriend;
 import com.example.whatsapp.Model.UserProfile;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,7 +32,7 @@ import java.util.List;
 public class ContactsFragment extends Fragment {
     private View view;
     private RecyclerView myContactsList;
-    List<UserProfile> userProfileList;
+    List<String> userIDList;
     private DatabaseReference ContacsRef, UsersRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
@@ -46,7 +48,7 @@ public class ContactsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_contacts, container, false);
-        userProfileList = new ArrayList<>();
+        userIDList = new ArrayList<>();
 
         myContactsList = (RecyclerView) view.findViewById(R.id.recyclerContact);
         myContactsList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -59,32 +61,20 @@ public class ContactsFragment extends Fragment {
         if (current_user != null) {
             ContacsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
             UsersRef = FirebaseDatabase.getInstance().getReference().child("users");
-            userProfileList.clear();
+            userIDList.clear();
 
             ContacsRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                        UsersRef.child(dataSnapshot1.getKey()).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
-                                userProfileList.add(userProfile);
-                                AdapterFriend adapterFriend = new AdapterFriend(getContext(), userProfileList);
-                                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-                                myContactsList.setLayoutManager(layoutManager);
-                                myContactsList.setAdapter(adapterFriend);
-                                adapterFriend.notifyDataSetChanged();
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
+                        userIDList.add(dataSnapshot1.getKey().toString());
                     }
-
+                    AdapterContact adapterContact = new AdapterContact(getContext(), userIDList);
+                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+                    myContactsList.setLayoutManager(layoutManager);
+                    myContactsList.setAdapter(adapterContact);
+                    adapterContact.notifyDataSetChanged();
                 }
 
                 @Override

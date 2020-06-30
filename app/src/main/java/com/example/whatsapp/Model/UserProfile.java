@@ -21,6 +21,10 @@ public class UserProfile implements Serializable {
     @Expose
     String status;
 
+    @SerializedName("userState")
+    @Expose
+    com.example.whatsapp.Model.userState userState;
+
     public UserProfile() {
     }
 
@@ -56,10 +60,19 @@ public class UserProfile implements Serializable {
         this.status = status;
     }
 
-    public UserProfile(String name, String image, String uid, String status) {
+    public com.example.whatsapp.Model.userState getUserState() {
+        return userState;
+    }
+
+    public void setUserState(com.example.whatsapp.Model.userState userState) {
+        this.userState = userState;
+    }
+
+    public UserProfile(String name, String image, String uid, String status, userState userState) {
         this.name = name;
         this.image = image;
         this.uid = uid;
         this.status = status;
+        this.userState=userState;
     }
 }
