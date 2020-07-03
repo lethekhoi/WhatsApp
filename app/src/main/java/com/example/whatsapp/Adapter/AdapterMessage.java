@@ -60,7 +60,12 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
         holder.messageSenderImage.setVisibility(View.INVISIBLE);
         //nếu message là text
         if (message.getType().equals("text")) {
-
+            ViewGroup.LayoutParams p = holder.messageSenderImage.getLayoutParams();
+            p.height = 0;
+            p.width = 0;
+            ViewGroup.LayoutParams p1 = holder.messageReceiveImage.getLayoutParams();
+            p1.height = 0;
+            p1.width = 0;
             if (current_user_id.equals(message.getFrom())) {
                 holder.sendMessage.setVisibility(View.VISIBLE);
                 holder.sendMessage.setBackgroundResource(R.drawable.send_message_layout);
@@ -116,14 +121,14 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
             }
         } else {
             if (current_user_id.equals(message.getFrom())) {
-                //hình ảnh bên send
-                Picasso.get().load(message.getMessage()).into(holder.messageSenderImage);
-                holder.messageSenderImage.setEnabled(true);
                 holder.messageSenderImage.setVisibility(View.VISIBLE);
-                RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(450, 450);
-                parms.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                holder.messageSenderImage.setLayoutParams(parms);
+                Picasso.get().load(message.getMessage()).into(holder.messageSenderImage);
+
             } else {
+
+//                holder.messageReceiveImage.setVisibility(View.VISIBLE);
+//                Picasso.get().load(message.getMessage()).into(holder.messageReceiveImage);
+
                 if (position != (messageList.size() - 1)) {
                     if (message.getFrom().equals(messageList.get(position + 1).getFrom())) {
                         holder.receiveImageProfile.setVisibility(View.INVISIBLE);
@@ -166,15 +171,11 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
                         }
                     });
                 }
-                Picasso.get().load(message.getMessage()).into(holder.messageReceiveImage);
-                holder.messageReceiveImage.setEnabled(true);
-                holder.messageReceiveImage.setVisibility(View.VISIBLE);
-                RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(450, 450);
-                parms.addRule(RelativeLayout.END_OF, R.id.imgcardview);
-                holder.messageReceiveImage.setLayoutParams(parms);
                 RelativeLayout.LayoutParams parms1 = (RelativeLayout.LayoutParams) holder.cardView.getLayoutParams();
                 parms1.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.message_receive_image_view);
                 holder.cardView.setLayoutParams(parms1);
+                holder.messageReceiveImage.setVisibility(View.VISIBLE);
+                Picasso.get().load(message.getMessage()).into(holder.messageReceiveImage);
 
 
             }

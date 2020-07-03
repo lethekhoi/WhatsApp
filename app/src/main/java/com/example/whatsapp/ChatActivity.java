@@ -119,7 +119,7 @@ public class ChatActivity extends AppCompatActivity {
                 builder.show();
             }
         });
-
+        messageList.clear();
         mDatabase.child("Message").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
                     @Override
