@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -48,12 +49,18 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
 
         Message message = messageList.get(position);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(message.getFrom());
+
+        holder.cardView.setVisibility(View.INVISIBLE);
+        holder.receiveImageProfile.setVisibility(View.INVISIBLE);
+        holder.receiveMessage.setVisibility(View.INVISIBLE);
+        holder.sendMessage.setVisibility(View.INVISIBLE);
+        holder.messageReceiveImage.setVisibility(View.INVISIBLE);
+        holder.messageReceiveImage.setEnabled(false);
+        holder.messageSenderImage.setEnabled(false);
+        holder.messageSenderImage.setVisibility(View.INVISIBLE);
         //nếu message là text
         if (message.getType().equals("text")) {
-            holder.cardView.setVisibility(View.INVISIBLE);
-            holder.receiveImageProfile.setVisibility(View.INVISIBLE);
-            holder.receiveMessage.setVisibility(View.INVISIBLE);
-            holder.sendMessage.setVisibility(View.INVISIBLE);
+
             if (current_user_id.equals(message.getFrom())) {
                 holder.sendMessage.setVisibility(View.VISIBLE);
                 holder.sendMessage.setBackgroundResource(R.drawable.send_message_layout);
@@ -108,6 +115,70 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
                 holder.receiveMessage.setText(message.getMessage());
             }
         } else {
+            if (current_user_id.equals(message.getFrom())) {
+                //hình ảnh bên send
+                Picasso.get().load(message.getMessage()).into(holder.messageSenderImage);
+                holder.messageSenderImage.setEnabled(true);
+                holder.messageSenderImage.setVisibility(View.VISIBLE);
+                RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(450, 450);
+                parms.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                holder.messageSenderImage.setLayoutParams(parms);
+            } else {
+                if (position != (messageList.size() - 1)) {
+                    if (message.getFrom().equals(messageList.get(position + 1).getFrom())) {
+                        holder.receiveImageProfile.setVisibility(View.INVISIBLE);
+                        holder.cardView.setVisibility(View.INVISIBLE);
+                    } else {
+                        holder.receiveImageProfile.setVisibility(View.VISIBLE);
+                        holder.cardView.setVisibility(View.VISIBLE);
+                        mDatabase.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.hasChild("image")) {
+                                    Picasso.get().load(dataSnapshot.child("image").getValue().toString()).into(holder.receiveImageProfile);
+                                } else {
+                                    holder.receiveImageProfile.setImageResource(R.drawable.default_user);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                } else {
+                    holder.receiveImageProfile.setVisibility(View.VISIBLE);
+                    holder.cardView.setVisibility(View.VISIBLE);
+                    mDatabase.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild("image")) {
+                                Picasso.get().load(dataSnapshot.child("image").getValue().toString()).into(holder.receiveImageProfile);
+                            } else {
+                                holder.receiveImageProfile.setImageResource(R.drawable.default_user);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                Picasso.get().load(message.getMessage()).into(holder.messageReceiveImage);
+                holder.messageReceiveImage.setEnabled(true);
+                holder.messageReceiveImage.setVisibility(View.VISIBLE);
+                RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(450, 450);
+                parms.addRule(RelativeLayout.END_OF, R.id.imgcardview);
+                holder.messageReceiveImage.setLayoutParams(parms);
+                RelativeLayout.LayoutParams parms1 = (RelativeLayout.LayoutParams) holder.cardView.getLayoutParams();
+                parms1.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.message_receive_image_view);
+                holder.cardView.setLayoutParams(parms1);
+
+
+            }
+
 
         }
 
@@ -120,7 +191,7 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView sendMessage, receiveMessage;
-        ImageView receiveImageProfile;
+        ImageView receiveImageProfile, messageSenderImage, messageReceiveImage;
         CardView cardView;
 
         public ViewHolder(@NonNull View itemView) {
@@ -128,6 +199,8 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
             sendMessage = itemView.findViewById(R.id.send_message_text);
             receiveMessage = itemView.findViewById(R.id.receive_message_text);
             receiveImageProfile = itemView.findViewById(R.id.message_profile_image);
+            messageSenderImage = itemView.findViewById(R.id.message_sender_image_view);
+            messageReceiveImage = itemView.findViewById(R.id.message_receive_image_view);
             cardView = itemView.findViewById(R.id.imgcardview);
         }
     }

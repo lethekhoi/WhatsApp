@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".ChatActivity">
 
     <include
@@ -31,6 +31,17 @@
         android:layout_marginBottom="10dp"
         android:background="@color/colorWhile"
         android:orientation="horizontal">
+
+        <ImageButton
+            android:background="@color/colorWhile"
+            android:id="@+id/send_files_btn"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:src="@drawable/send_files"
+
+            />
 
         <EditText
             android:id="@+id/edtmessage"

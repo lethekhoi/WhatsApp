@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.whatsapp.Model.UserProfile;
+import com.example.whatsapp.Model.userState;
 import com.example.whatsapp.ProfileActivity;
 import com.example.whatsapp.R;
 import com.google.firebase.database.DataSnapshot;
@@ -36,14 +37,14 @@ public class AdapterContact extends RecyclerView.Adapter<AdapterContact.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtName, txtStatus;
-        ImageView imgUserProfil;
+        ImageView imgUserProfil, imgOnline;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             txtName = itemView.findViewById(R.id.txtUserName);
             txtStatus = itemView.findViewById(R.id.txtUserStatus);
             imgUserProfil = itemView.findViewById(R.id.user_profile_image);
-
+            imgOnline = itemView.findViewById(R.id.imgonline);
 
         }
     }
@@ -64,6 +65,21 @@ public class AdapterContact extends RecyclerView.Adapter<AdapterContact.ViewHold
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final UserProfile userProfile = dataSnapshot.getValue(UserProfile.class);
+                final userState userState = userProfile.getUserState();
+                if (userState != null) {
+
+                    String state = userState.getState();
+
+
+                    if (state.equals("online")) {
+                        holder.imgOnline.setVisibility(View.VISIBLE);
+                        holder.txtStatus.setVisibility(View.INVISIBLE);
+                    } else if (state.equals("offline")) {
+                        holder.imgOnline.setVisibility(View.INVISIBLE);
+                        holder.txtStatus.setVisibility(View.VISIBLE);
+                        holder.txtStatus.setText(userProfile.getStatus());
+                    }
+                }
                 holder.txtName.setText(userProfile.getName());
                 holder.txtStatus.setText(userProfile.getStatus());
                 if (userProfile.getImage() == null | userProfile.getImage() == "") {

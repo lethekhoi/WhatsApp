@@ -90,27 +90,5 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("ooo", "destroy");
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("ooo", "start");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d("ooo", "stop");
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.d("ooo", "attach");
-    }
 }

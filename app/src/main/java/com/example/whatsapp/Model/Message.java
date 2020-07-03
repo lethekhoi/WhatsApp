@@ -16,6 +16,51 @@ public class Message {
     @SerializedName("messageID")
     @Expose
     private String messageID;
+    @SerializedName("to")
+    @Expose
+    private String to;
+    @SerializedName("time")
+    @Expose
+    private String time;
+    @SerializedName("date")
+    @Expose
+    private String date;
+
+
+    public Message(String from, String message, String type, String messageID, String to, String time, String date) {
+        this.from = from;
+        this.message = message;
+        this.type = type;
+        this.messageID = messageID;
+        this.to = to;
+        this.time = time;
+        this.date = date;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
 
     public Message() {
     }
@@ -52,10 +97,5 @@ public class Message {
         this.messageID = messageID;
     }
 
-    public Message(String from, String message, String type, String messageID) {
-        this.from = from;
-        this.message = message;
-        this.type = type;
-        this.messageID = messageID;
-    }
+
 }
