@@ -25,9 +25,21 @@ public class Message {
     @SerializedName("date")
     @Expose
     private String date;
+    @SerializedName("name")
+    @Expose
+    private String name;
 
 
-    public Message(String from, String message, String type, String messageID, String to, String time, String date) {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Message(String from, String message, String type, String messageID, String to, String time, String date, String name) {
+        this.name = name;
         this.from = from;
         this.message = message;
         this.type = type;

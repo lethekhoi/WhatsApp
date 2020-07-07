@@ -33,6 +33,8 @@ import com.example.whatsapp.Model.Message;
 import com.example.whatsapp.Model.UserProfile;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -42,8 +44,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -111,8 +115,17 @@ public class ChatActivity extends AppCompatActivity {
                             startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
                         } else if (i == 1) {
                             checker = "pdf";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("application/pdf");
+                            startActivityForResult(intent.createChooser(intent, "Select PDF Files"), 438);
                         } else if (i == 2) {
                             checker = "docx";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
+                            startActivityForResult(intent.createChooser(intent, "Select Ms Word Files"), 438);
                         }
                     }
                 });
@@ -167,6 +180,61 @@ public class ChatActivity extends AppCompatActivity {
             loadingBar.show();
             fileUri = data.getData();
             if (!checker.equals("image")) {
+
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Document Files");
+                final String messageSenderRef = "Message/" + messageSenderID + "/" + messageReceiverID;
+                final String messageReceiverRef = "Message/" + messageReceiverID + "/" + messageSenderID;
+                DatabaseReference userMessageKeyRef = mDatabase.child("Message")
+                        .child(messageSenderID).child(messageReceiverID).push();
+
+                final String messagePushID = userMessageKeyRef.getKey();
+
+                final StorageReference filePath = storageReference.child(messagePushID + "." + checker);
+
+                filePath.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                String downloadUrl = uri.toString();
+
+                                Map messageDocsBody = new HashMap();
+                                messageDocsBody.put("message", downloadUrl);
+                                messageDocsBody.put("name", fileUri.getLastPathSegment());
+                                messageDocsBody.put("type", checker);
+
+                                messageDocsBody.put("from", messageSenderID);
+                                messageDocsBody.put("to", messageReceiverID);
+                                messageDocsBody.put("messageID", messagePushID);
+                                messageDocsBody.put("time", saveCurrentTime);
+                                messageDocsBody.put("date", saveCurrentDay);
+
+
+                                Map messageBodyDetail = new HashMap();
+                                messageBodyDetail.put(messageSenderRef + "/" + messagePushID, messageDocsBody);
+                                messageBodyDetail.put(messageReceiverRef + "/" + messagePushID, messageDocsBody);
+
+                                mDatabase.updateChildren(messageBodyDetail);
+                                loadingBar.dismiss();
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                loadingBar.dismiss();
+                                Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double p = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                        loadingBar.setMessage((int) p + " % Uploading...");
+                    }
+                });
+
 
             } else if (checker.equals("image")) {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Image Files");

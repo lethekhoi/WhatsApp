@@ -1,12 +1,15 @@
 package com.example.whatsapp.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -46,8 +49,9 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         String current_user_id = mAuth.getCurrentUser().getUid();
-
-        Message message = messageList.get(position);
+        ViewGroup.LayoutParams paramsSender = holder.messageSenderImage.getLayoutParams();
+        ViewGroup.LayoutParams paramsReceive = holder.messageReceiveImage.getLayoutParams();
+        final Message message = messageList.get(position);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(message.getFrom());
 
         holder.cardView.setVisibility(View.INVISIBLE);
@@ -60,12 +64,11 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
         holder.messageSenderImage.setVisibility(View.INVISIBLE);
         //nếu message là text
         if (message.getType().equals("text")) {
-            ViewGroup.LayoutParams p = holder.messageSenderImage.getLayoutParams();
-            p.height = 0;
-            p.width = 0;
-            ViewGroup.LayoutParams p1 = holder.messageReceiveImage.getLayoutParams();
-            p1.height = 0;
-            p1.width = 0;
+
+            paramsSender.height = 0;
+            paramsSender.width = 0;
+            paramsReceive.height = 0;
+            paramsReceive.width = 0;
             if (current_user_id.equals(message.getFrom())) {
                 holder.sendMessage.setVisibility(View.VISIBLE);
                 holder.sendMessage.setBackgroundResource(R.drawable.send_message_layout);
@@ -119,7 +122,7 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
                 holder.receiveMessage.setBackgroundResource(R.drawable.receive_message_layout);
                 holder.receiveMessage.setText(message.getMessage());
             }
-        } else {
+        } else if (message.getType().equals("image")) {
             if (current_user_id.equals(message.getFrom())) {
                 holder.messageSenderImage.setVisibility(View.VISIBLE);
                 Picasso.get().load(message.getMessage()).into(holder.messageSenderImage);
@@ -181,6 +184,84 @@ public class AdapterMessage extends RecyclerView.Adapter<AdapterMessage.ViewHold
             }
 
 
+        } else {
+            if (current_user_id.equals(message.getFrom())) {
+
+                paramsSender.height = 128;
+                paramsSender.width = 128;
+                paramsReceive.height = 0;
+                paramsReceive.width = 0;
+                holder.messageSenderImage.setVisibility(View.VISIBLE);
+                holder.messageSenderImage.setBackgroundResource(message.getType().equals("pdf") ? R.drawable.ic_pdf :
+                        message.getType().equals("docx") ? R.drawable.ic_docx : R.drawable.file);
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(message.getMessage()));
+                        holder.messageSenderImage.getContext().startActivity(intent);
+                    }
+                });
+            } else {
+                if (position != (messageList.size() - 1)) {
+                    if (message.getFrom().equals(messageList.get(position + 1).getFrom())) {
+                        holder.receiveImageProfile.setVisibility(View.INVISIBLE);
+                        holder.cardView.setVisibility(View.INVISIBLE);
+                    } else {
+                        holder.receiveImageProfile.setVisibility(View.VISIBLE);
+                        holder.cardView.setVisibility(View.VISIBLE);
+                        mDatabase.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.hasChild("image")) {
+                                    Picasso.get().load(dataSnapshot.child("image").getValue().toString()).into(holder.receiveImageProfile);
+                                } else {
+                                    holder.receiveImageProfile.setImageResource(R.drawable.default_user);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                } else {
+                    holder.receiveImageProfile.setVisibility(View.VISIBLE);
+                    holder.cardView.setVisibility(View.VISIBLE);
+                    mDatabase.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild("image")) {
+                                Picasso.get().load(dataSnapshot.child("image").getValue().toString()).into(holder.receiveImageProfile);
+                            } else {
+                                holder.receiveImageProfile.setImageResource(R.drawable.default_user);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                paramsReceive.height = 128;
+                paramsReceive.width = 128;
+                paramsSender.height = 0;
+                paramsSender.width = 0;
+                holder.messageReceiveImage.setVisibility(View.VISIBLE);
+                holder.messageReceiveImage.setBackgroundResource(message.getType().equals("pdf") ? R.drawable.ic_pdf :
+                        message.getType().equals("docx") ? R.drawable.ic_docx : R.drawable.file);
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(message.getMessage()));
+                        holder.messageSenderImage.getContext().startActivity(intent);
+                    }
+                });
+            }
         }
 
     }
